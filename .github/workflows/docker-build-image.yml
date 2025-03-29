@@ -53,6 +53,7 @@ jobs:
             GLMARK2_REPO=${{ env.GLMARK2_REPO }}
             GLMARK2_TAG=${{ env.GLMARK2_TAG }}
           push: false
+          load: true
           platforms: linux/amd64
           tags: |
             ghcr.io/${{ github.repository }}:${{ steps.version.outputs.value }}
