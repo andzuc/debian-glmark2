@@ -1,4 +1,4 @@
-name: Build glmark2 with Dockerfile
+name: docker-build-image
 
 on:
   workflow_dispatch:

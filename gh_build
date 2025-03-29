@@ -11,6 +11,6 @@ fi
 DEBIAN_VERSION="$1"
 GLMARK2_TAG="$2"
 
-gh workflow run build-image \
+gh workflow run docker-build-image \
    -F debian_version="${DEBIAN_VERSION}" \
    -F glmark2_tag="${GLMARK2_TAG}"

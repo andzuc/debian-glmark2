@@ -2,9 +2,9 @@
 ARG DEBIAN_VERSION=buster
 ARG GLMARK2_REPO=https://github.com/glmark2/glmark2.git
 ARG GLMARK2_TAG=2021.02
-LABEL maintainer="Andrea Zuccherelli <andrea@zuccherelli.net>"
 # Usa l'immagine Debian specificata
 FROM debian:${DEBIAN_VERSION}
+LABEL maintainer="Andrea Zuccherelli <andrea@zuccherelli.net>"
 
 # Imposta le variabili d'ambiente per il build
 ENV GLMARK2_REPO=${GLMARK2_REPO} \
