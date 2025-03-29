@@ -23,7 +23,7 @@ jobs:
       - name: Set version value
         id: version
         run: |
-          echo "value=${DEBIAN_VERSION}.${GLMARK2_TAG}.$(date +'%Y%m%d').${{ github.run_number }}" >> $GITHUB_OUTPUT
+          echo "value=${GLMARK2_TAG}.${DEBIAN_VERSION}.$(date +'%Y%m%d').${{ github.run_number }}" >> $GITHUB_OUTPUT
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
@@ -44,7 +44,7 @@ jobs:
       #   with:
       #     username: ${{ secrets.DOCKERHUB_USERNAME }}
       #     password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
-      - name: Build and push
+      - name: Build
         uses: docker/build-push-action@v6
         with:
           context: "{{defaultContext}}:context"
@@ -52,7 +52,24 @@ jobs:
             DEBIAN_VERSION=${{ env.DEBIAN_VERSION }}
             GLMARK2_REPO=${{ env.GLMARK2_REPO }}
             GLMARK2_TAG=${{ env.GLMARK2_TAG }}
-          push: true
+          push: false
           platforms: linux/amd64
           tags: |
             ghcr.io/${{ github.repository }}:${{ steps.version.outputs.value }}
+            debian-glmark2:latest
+      # Estrai il binario dall'immagine
+      - name: Extract glmark2 binary
+        run: |
+          docker create --name glmark2-container debian-glmark2:latest
+          docker cp glmark2-container:/usr/local/bin/glmark2 ./glmark2
+          docker rm glmark2-container
+      # Crea una release e carica il binario
+      - name: Create Release with Binary
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: "v${{ steps.version.outputs.value }}"
+          name: "glmark2 ${{ steps.version.outputs.value }}"
+          body: "Compiled glmark2 binary for tag ${{ env.GLMARK2_TAG }} on Debian ${{ env.DEBIAN_VERSION }}"
+          files: glmark2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
