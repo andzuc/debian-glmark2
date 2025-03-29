@@ -48,10 +48,10 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: "{{defaultContext}}:context"
-          build-args: |
-            DEBIAN_VERSION=${{ env.DEBIAN_VERSION }}
-            GLMARK2_REPO=${{ env.GLMARK2_REPO }}
-            GLMARK2_TAG=${{ env.GLMARK2_TAG }}
+          build-args:
+            - DEBIAN_VERSION=${{ env.DEBIAN_VERSION }}
+            - GLMARK2_REPO=${{ env.GLMARK2_REPO }}
+            - GLMARK2_TAG=${{ env.GLMARK2_TAG }}
           push: true
           platforms: linux/amd64
           tags: |
