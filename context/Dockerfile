@@ -20,7 +20,8 @@ RUN apt-get update && apt-get install -y \
     libpng-dev \
     libx11-dev \
     meson \
-    ninja-build && \
+    ninja-build \
+    pkg-config && \
     rm -rf /var/lib/apt/lists/*
 
 # Clona il repository glmark2 con il tag specificato
