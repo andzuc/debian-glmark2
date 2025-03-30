@@ -1,0 +1,35 @@
+#!/bin/bash
+
+# Variabili: modifica queste con il tuo repository
+REPO="andzuc/debian-glmark2"  # Es. "octocat/hello-world"
+OUTPUT_DIR="./downloads"  # Directory dove salvare il file
+
+# Crea la directory di output se non esiste
+mkdir -p "$OUTPUT_DIR"
+
+# URL dell'API per la latest release
+API_URL="https://api.github.com/repos/$REPO/releases/latest"
+
+# Recupera i dati della release e usa jq per estrarre l'URL del primo asset
+ASSET_URL=$(curl -s "$API_URL" | jq -r '.assets[0].browser_download_url')
+
+# Controlla se l'URL è stato trovato
+if [ -z "$ASSET_URL" ] || [ "$ASSET_URL" == "null" ]; then
+    echo "Errore: Nessun asset trovato nella latest release di $REPO."
+    exit 1
+fi
+
+# Nome del file dall'URL (estrae l'ultima parte del percorso)
+FILE_NAME=$(basename "$ASSET_URL")
+
+# Scarica il file
+echo "Scaricamento dell'asset da $ASSET_URL..."
+curl -L -o "$OUTPUT_DIR/$FILE_NAME" "$ASSET_URL"
+
+# Verifica se il download è riuscito
+if [ $? -eq 0 ]; then
+    echo "Download completato: $OUTPUT_DIR/$FILE_NAME"
+else
+    echo "Errore durante il download."
+    exit 1
+fi
