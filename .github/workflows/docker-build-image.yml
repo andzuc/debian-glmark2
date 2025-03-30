@@ -39,12 +39,7 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      # - name: Login to DockerHub
-      #   uses: docker/login-action@v2
-      #   with:
-      #     username: ${{ secrets.DOCKERHUB_USERNAME }}
-      #     password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
-      - name: Build
+      - name: Build Docker image
         uses: docker/build-push-action@v6
         with:
           context: "{{defaultContext}}:context"
@@ -58,19 +53,23 @@ jobs:
           tags: |
             ghcr.io/${{ github.repository }}:${{ steps.version.outputs.value }}
             debian-glmark2:latest
-      # Estrai il binario dall'immagine
-      - name: Extract glmark2 binary
+      - name: Create self-contained glmark2 package
         run: |
+          mkdir glmark2-package
           docker create --name glmark2-container debian-glmark2:latest
-          docker cp glmark2-container:/usr/local/bin/glmark2 ./glmark2
+          docker cp glmark2-container:/opt/glmark2 glmark2-package/glmark2
           docker rm glmark2-container
-      # Crea una release e carica il binario
-      - name: Create Release with Binary
+          tar -czf glmark2-${{ steps.version.outputs.value }}.tar.gz -C glmark2-package glmark2
+      - name: Create Release with Self-Contained Package
         uses: softprops/action-gh-release@v2
         with:
           tag_name: "v${{ steps.version.outputs.value }}"
           name: "glmark2 ${{ steps.version.outputs.value }}"
-          body: "Compiled glmark2 binary for tag ${{ env.GLMARK2_TAG }} on Debian ${{ env.DEBIAN_VERSION }}"
-          files: glmark2
+          body: |
+            Self-contained glmark2 package for tag ${{ env.GLMARK2_TAG }} on Debian ${{ env.DEBIAN_VERSION }}.
+            To run:
+            1. Extract the archive: `tar -xzf glmark2-${{ steps.version.outputs.value }}.tar.gz`
+            2. Run: `./glmark2/bin/glmark2 --fullscreen`
+          files: glmark2-${{ steps.version.outputs.value }}.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

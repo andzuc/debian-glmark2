@@ -22,17 +22,18 @@ RUN apt-get update && apt-get install -y \
     meson \
     ninja-build \
     pkg-config \
-    libjpeg-dev && \
-    rm -rf /var/lib/apt/lists/*
+    libjpeg-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 # Clona il repository glmark2 con il tag specificato
 WORKDIR /usr/local/src
 RUN git clone --branch ${GLMARK2_TAG} --depth 1 ${GLMARK2_REPO} glmark2
 
-# Compila glmark2 con meson
-WORKDIR /usr/local/src/glmark2
-RUN meson setup build -Dflavors=x11-gl && \
-    ninja -C build
+WORKDIR /usr/src/glmark2
+# Patch per rendere il data_path relativo al binario
+RUN sed -i 's|std::string Options::data_path = GLMARK_DATA_PATH;|std::string Options::data_path = std::string(dirname(realpath("/proc/self/exe", NULL))) + "/../share/glmark2";|' src/options.cpp \
+    && meson setup build -Dflavors=x11-gl -Dprefix=/opt/glmark2 \
+    && ninja -C build install
 
 # Copia il binario
 RUN cp ./build/src/glmark2 /usr/local/bin/
