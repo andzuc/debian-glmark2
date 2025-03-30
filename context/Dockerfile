@@ -29,7 +29,7 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /usr/local/src
 RUN git clone --branch ${GLMARK2_TAG} --depth 1 ${GLMARK2_REPO} glmark2
 
-WORKDIR /usr/src/glmark2
+WORKDIR /usr/local/src/glmark2
 RUN ls -Rl
 # Patch per rendere il data_path relativo al binario
 RUN sed -i 's|std::string Options::data_path = GLMARK_DATA_PATH;|std::string Options::data_path = std::string(dirname(realpath("/proc/self/exe", NULL))) + "/../share/glmark2";|' src/options.cpp \
