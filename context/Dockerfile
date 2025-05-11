@@ -24,6 +24,7 @@ RUN apt-get update && apt-get install -y \
     pkg-config \
     libjpeg-dev \
     libgbm-dev \
+    libudev-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Clona il repository glmark2 con il tag specificato
