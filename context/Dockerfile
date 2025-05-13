@@ -36,7 +36,7 @@ RUN ls -Rl
 # Patch per rendere il data_path relativo al binario
 RUN sed -i '1i#include <libgen.h>\n#include <stdlib.h>' src/options.cpp \
     && sed -i 's|std::string Options::data_path = std::string(GLMARK_DATA_PATH);|std::string Options::data_path = std::string(dirname(realpath("/proc/self/exe", NULL))) + "/../share/glmark2";|' src/options.cpp \
-    && meson setup build -Dflavors=drm-gl,x11-gl -Dprefix=/opt/glmark2 \
+    && meson setup build -Dflavors=drm-gl,x11-gl -Dprefix=/opt/glmark2 --buildtype=debug \
     && ninja -C build install
 
 # Copia il binario
